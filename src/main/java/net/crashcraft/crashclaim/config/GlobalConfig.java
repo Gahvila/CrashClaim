@@ -15,10 +15,33 @@ public class GlobalConfig extends BaseConfig{
     public static String paymentProvider;
     public static boolean skipNaturalMobGrief;
 
+    public static int initialClaimBlocks;
+    public static int maxClaimBlocks;
+    public static int claimBlockReward;
+    public static int claimBlockRewardMillis;
+
+    public static boolean sendRewardAlert;
+    public static int alertFadeIn;
+    public static int alertDuration;
+    public static int alertFadeOut;
+
+    public static boolean sendInChatInstead;
+
     private static void loadGeneral(){
         locale = getString("language", "en_US");
-        paymentProvider = getString("payment-provider", "default");
         skipNaturalMobGrief = getBoolean("skip-natural-mob-grief", false);
+
+        initialClaimBlocks = getInt("initial-claimblocks", 100);
+        maxClaimBlocks = getInt("max-claimblocks", 5000);
+
+        claimBlockReward = getInt("reward", 25);
+        claimBlockRewardMillis = getInt("reward-minutes", 60) * 60 * 1000;
+
+        sendRewardAlert = getBoolean("send-reward-alert", true);
+        alertFadeIn = getInt("reward-alert.fadeIn", 15);
+        alertDuration = getInt("reward-alert.duration", 20);
+        alertFadeOut = getInt("reward-alert.fadeOut", 15);
+        sendInChatInstead = getBoolean("send-reward-alert-in-chat", false);
     }
 
     public static HashMap<String, GroupSettings> groupSettings;

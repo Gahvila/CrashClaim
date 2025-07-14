@@ -13,4 +13,8 @@ public interface PaymentProvider {
     void makeTransaction(UUID user, TransactionType type, String comment, double amount, Consumer<TransactionRecipe> callback);
 
     void getBalance(UUID user, Consumer<Double> callback);
+
+    default double getCachedBalance(UUID user) {
+        return 0D;
+    }
 }

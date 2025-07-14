@@ -1,6 +1,5 @@
 package net.crashcraft.crashclaim.crashutils;
 
-import io.papermc.lib.PaperLib;
 import net.crashcraft.crashclaim.crashutils.caches.TextureCache;
 import net.crashcraft.crashclaim.crashutils.menusystem.CrashMenuController;
 import org.bukkit.Bukkit;

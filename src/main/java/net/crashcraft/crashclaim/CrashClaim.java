@@ -6,12 +6,12 @@ import co.aikar.taskchain.TaskChainFactory;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
-import io.papermc.lib.PaperLib;
 import net.crashcraft.crashclaim.api.CrashClaimAPI;
 import net.crashcraft.crashclaim.commands.CommandManager;
 import net.crashcraft.crashclaim.commands.claiming.ClaimCommand;
 import net.crashcraft.crashclaim.config.ConfigManager;
 import net.crashcraft.crashclaim.config.GlobalConfig;
+import net.crashcraft.crashclaim.economy.RewardManager;
 import net.crashcraft.crashclaim.listeners.PacketEventsListener;
 import net.crashcraft.crashclaim.payment.PaymentProcessor;
 import net.crashcraft.crashclaim.payment.PaymentProvider;
@@ -24,14 +24,11 @@ import net.crashcraft.crashclaim.data.MaterialName;
 import net.crashcraft.crashclaim.listeners.PlayerListener;
 import net.crashcraft.crashclaim.listeners.WorldListener;
 import net.crashcraft.crashclaim.localization.LocalizationLoader;
-import net.crashcraft.crashclaim.migration.MigrationManager;
 import net.crashcraft.crashclaim.packet.PacketHandler;
 import net.crashcraft.crashclaim.permissions.PermissionHelper;
 import net.crashcraft.crashclaim.pluginsupport.PluginSupport;
 import net.crashcraft.crashclaim.pluginsupport.PluginSupportManager;
 import net.crashcraft.crashclaim.visualize.VisualizationManager;
-import org.bstats.bukkit.Metrics;
-import org.bstats.charts.SimplePie;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
@@ -58,7 +55,7 @@ public class CrashClaim extends JavaPlugin {
     private MaterialName materialName;
     private PaymentProcessor payment;
     private CommandManager commandManager;
-    private MigrationManager migrationManager;
+    private RewardManager rewardManager;
 
     @Override
     public void onLoad() {
@@ -79,11 +76,6 @@ public class CrashClaim extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        List<String> supportedVersions = Arrays.asList("1.20.4", "1.20.5", "1.20.6", "1.21", "1.21.1", "1.21.2", "1.21.3", "1.21.4"); //order from min to max
-        if (!isServerSupported(supportedVersions)) {
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
         Bukkit.getPluginManager().registerEvents(pluginSupport, this);
 
         taskChainFactory = BukkitTaskChainFactory.create(this);
@@ -101,6 +93,11 @@ public class CrashClaim extends JavaPlugin {
 
         payment = setupPaymentProvider(this, GlobalConfig.paymentProvider).getProcessor();
 
+        if (GlobalConfig.claimBlockRewardMillis > 0) {
+            getLogger().info("Starting Reward Routine");
+            rewardManager = new RewardManager(this, payment.getProvider());
+        }
+
         this.visualizationManager = new VisualizationManager(this);
         this.manager = new ClaimDataManager(this);
         this.materialName = new MaterialName();
@@ -109,9 +106,9 @@ public class CrashClaim extends JavaPlugin {
 
         new PermissionHelper(manager);
 
-        this.migrationManager = new MigrationManager(this);
-        commandManager = new CommandManager(this);
+        commandManager = new CommandManager(this, payment);
 
+        Bukkit.getPluginManager().registerEvents(rewardManager, this);
         Bukkit.getPluginManager().registerEvents(new WorldListener(manager, visualizationManager), this);
         Bukkit.getPluginManager().registerEvents(new PlayerListener(manager, visualizationManager), this);
 
@@ -124,11 +121,6 @@ public class CrashClaim extends JavaPlugin {
 
         Bukkit.getServicesManager().register(PaymentProvider.class, payment.getProvider(), plugin, ServicePriority.Normal);
 
-        if (GlobalConfig.useStatistics) {
-            getLogger().info("Enabling Statistics");
-            Metrics metrics = new Metrics(this, 12015);
-            metrics.addCustomChart(new SimplePie("used_language", () -> GlobalConfig.locale));
-        }
 
         this.api = new CrashClaimAPI(this); // Enable api last as it might require some instances before to function properly.
     }
@@ -163,7 +155,6 @@ public class CrashClaim extends JavaPlugin {
         materialName = null;
         payment = null;
         commandManager = null;
-        migrationManager = null;
     }
     public ProcessorManager setupPaymentProvider(JavaPlugin plugin){
         return setupPaymentProvider(plugin, "");
@@ -200,13 +191,6 @@ public class CrashClaim extends JavaPlugin {
     }
 
     private boolean isServerSupported(List<String> supportedVersions) {
-        if (!PaperLib.isPaper()) {
-            getLogger().severe("CrashClaim requires Paper to run.");
-            PaperLib.suggestPaper(this);
-            getServer().getPluginManager().disablePlugin(this);
-            return false;
-        }
-
         String minecraftVersion = Bukkit.getMinecraftVersion();
         int minecraftVersionInt = versionStringToInt(minecraftVersion);
         int minSupportedVersionInt = versionStringToInt(supportedVersions.getFirst());
@@ -278,11 +262,6 @@ public class CrashClaim extends JavaPlugin {
         return commandManager;
     }
 
-
-    public MigrationManager getMigrationManager() {
-        return migrationManager;
-    }
-
     public PacketHandler getHandler() {
         return handler;
     }
@@ -293,5 +272,9 @@ public class CrashClaim extends JavaPlugin {
 
     public PluginSupportManager getPluginSupportManager() {
         return pluginSupport;
+    }
+
+    public PaymentProcessor getPaymentProcessor() {
+        return payment;
     }
 }

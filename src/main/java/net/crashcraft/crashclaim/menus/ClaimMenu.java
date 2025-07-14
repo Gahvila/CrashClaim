@@ -1,5 +1,12 @@
 package net.crashcraft.crashclaim.menus;
 
+import io.papermc.paper.dialog.Dialog;
+import io.papermc.paper.registry.data.dialog.ActionButton;
+import io.papermc.paper.registry.data.dialog.DialogBase;
+import io.papermc.paper.registry.data.dialog.action.DialogAction;
+import io.papermc.paper.registry.data.dialog.body.DialogBody;
+import io.papermc.paper.registry.data.dialog.input.DialogInput;
+import io.papermc.paper.registry.data.dialog.type.DialogType;
 import net.crashcraft.crashclaim.CrashClaim;
 import net.crashcraft.crashclaim.claimobjects.Claim;
 import net.crashcraft.crashclaim.claimobjects.SubClaim;
@@ -12,13 +19,18 @@ import net.crashcraft.crashclaim.menus.list.SubClaimListMenu;
 import net.crashcraft.crashclaim.menus.permissions.SimplePermissionMenu;
 import net.crashcraft.crashclaim.permissions.PermissionHelper;
 import net.crashcraft.crashclaim.permissions.PermissionRoute;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickCallback;
 import net.md_5.bungee.api.chat.BaseComponent;
-import net.wesjd.anvilgui.AnvilGUI;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.Arrays;
+
+import static net.gahvila.gahvilacore.Utils.MiniMessageUtils.toMM;
 
 public class ClaimMenu extends GUI {
     private final Claim claim;
@@ -139,16 +151,29 @@ public class ClaimMenu extends GUI {
                 break;
             case 32:
                 if (helper.hasPermission(claim, getPlayer().getUniqueId(), PermissionRoute.MODIFY_CLAIM)) {
-                    new AnvilGUI.Builder()
-                            .plugin(CrashClaim.getPlugin())
-                            .itemLeft(Localization.MENU__CLAIM__RENAME__MESSAGE.getItem(player))
-                            .onClick(((slot, reply) -> {
-                                claim.setName(reply.getText());
-                                player.sendMessage(Localization.MENU__CLAIM__RENAME__CONFIRMATION.getMessage(player,
-                                        "name", reply.getText()));
-                                return AnvilGUI.Response.close();
-                            }))
-                            .open(getPlayer());
+                    player.showDialog(Dialog.create(builder -> builder.empty()
+                            .base(DialogBase.builder(toMM("<white>Olet muokkaamassa claimin nimeä</white>"))
+                                    .inputs(Arrays.asList(
+                                            DialogInput.text("newName", toMM("Syötä uusi nimi"))
+                                                    .initial(claim.getName() != null ? claim.getName() : "")
+                                                    .maxLength(30)
+                                                    .build()
+                                    ))
+                                    .build())
+                            .type(DialogType.confirmation(
+                                    ActionButton.builder(Component.text("Tallenna"))
+                                            .action(DialogAction.customClick((response, audience) -> {
+                                                        claim.setName(response.getText("newName"));
+                                                        player.sendRichMessage("<white>Suojauksen nimi vaihdettu:</white> " + response.getText("newName"));
+                                                    },
+                                                    ClickCallback.Options.builder().build()))
+                                            .width(150)
+                                            .build(),
+                                    ActionButton.builder(Component.text("Peruuta"))
+                                            .width(150)
+                                            .build()
+
+                            ))));
                 } else {
                     player.sendMessage(Localization.MENU__GENERAL__INSUFFICIENT_PERMISSION.getMessage(player));
                     forceClose();
@@ -156,16 +181,29 @@ public class ClaimMenu extends GUI {
                 break;
             case 33:
                 if (helper.hasPermission(claim, getPlayer().getUniqueId(), PermissionRoute.MODIFY_CLAIM)) {
-                    new AnvilGUI.Builder()
-                            .plugin(CrashClaim.getPlugin())
-                            .itemLeft(Localization.MENU__CLAIM__ENTRY_MESSAGE__MESSAGE.getItem(player))
-                            .onClick(((slot, reply) -> {
-                                claim.setEntryMessage(reply.getText());
-                                player.sendMessage(Localization.MENU__CLAIM__ENTRY_MESSAGE__CONFIRMATION.getMessage(player,
-                                        "entry_message", reply.getText()));
-                                return AnvilGUI.Response.close();
-                            }))
-                            .open(getPlayer());
+                    player.showDialog(Dialog.create(builder -> builder.empty()
+                            .base(DialogBase.builder(toMM("<white>Olet muokkaamassa claimin saapumisviestiä</white>"))
+                                    .inputs(Arrays.asList(
+                                            DialogInput.text("newEntryMessage", toMM("Syötä uusi saapumisviesti"))
+                                                    .initial(claim.getEntryMessage() != null ? claim.getEntryMessage() : "")
+                                                    .maxLength(30)
+                                                    .build()
+                                    ))
+                                    .build())
+                            .type(DialogType.confirmation(
+                                    ActionButton.builder(Component.text("Tallenna"))
+                                            .action(DialogAction.customClick((response, audience) -> {
+                                                        claim.setEntryMessage(response.getText("newEntryMessage"));
+                                                        player.sendRichMessage("<white>Suojauksen saapumisviesti vaihdettu:</white> " + response.getText("newEntryMessage"));
+                                                    },
+                                                    ClickCallback.Options.builder().build()))
+                                            .width(150)
+                                            .build(),
+                                    ActionButton.builder(Component.text("Peruuta"))
+                                            .width(150)
+                                            .build()
+
+                            ))));
                 } else {
                     player.sendMessage(Localization.MENU__GENERAL__INSUFFICIENT_PERMISSION.getMessage(player));
                     forceClose();
@@ -173,16 +211,29 @@ public class ClaimMenu extends GUI {
                 break;
             case 34:
                 if (helper.hasPermission(claim, getPlayer().getUniqueId(), PermissionRoute.MODIFY_CLAIM)) {
-                    new AnvilGUI.Builder()
-                            .plugin(CrashClaim.getPlugin())
-                            .itemLeft(Localization.MENU__CLAIM__EXIT_MESSAGE__MESSAGE.getItem(player))
-                            .onClick(((slot, reply) -> {
-                                claim.setExitMessage(reply.getText());
-                                player.sendMessage(Localization.MENU__CLAIM__EXIT_MESSAGE__CONFIRMATION.getMessage(player,
-                                        "exit_message", reply.getText()));
-                                return AnvilGUI.Response.close();
-                            }))
-                            .open(getPlayer());
+                    player.showDialog(Dialog.create(builder -> builder.empty()
+                            .base(DialogBase.builder(toMM("<white>Olet muokkaamassa claimin poistumisviestiä</white>"))
+                                    .inputs(Arrays.asList(
+                                            DialogInput.text("newExitMessage", toMM("Syötä uusi poistumisviesti"))
+                                                    .initial(claim.getExitMessage() != null ? claim.getExitMessage() : "")
+                                                    .maxLength(30)
+                                                    .build()
+                                    ))
+                                    .build())
+                            .type(DialogType.confirmation(
+                                    ActionButton.builder(Component.text("Tallenna"))
+                                            .action(DialogAction.customClick((response, audience) -> {
+                                                        claim.setExitMessage(response.getText("newExitMessage"));
+                                                        player.sendRichMessage("<white>Suojauksen poistumisviesti vaihdettu:</white> " + response.getText("newExitMessage"));
+                                                    },
+                                                    ClickCallback.Options.builder().build()))
+                                            .width(150)
+                                            .build(),
+                                    ActionButton.builder(Component.text("Peruuta"))
+                                            .width(150)
+                                            .build()
+
+                            ))));
                 } else {
                     player.sendMessage(Localization.MENU__GENERAL__INSUFFICIENT_PERMISSION.getMessage(player));
                     forceClose();

@@ -2,6 +2,7 @@ package net.crashcraft.crashclaim.localization;
 
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.crashcraft.crashclaim.CrashClaim;
+import net.crashcraft.crashclaim.payment.PaymentProcessor;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -21,7 +22,7 @@ public class PlaceholderManager {
 
     public void registerPlaceholders(){
         if (isEnabled){
-            new CrashClaimExpansion(CrashClaim.getPlugin()).register();
+            new CrashClaimExpansion(CrashClaim.getPlugin(), CrashClaim.getPlugin().getPaymentProcessor()).register();
         }
     }
 

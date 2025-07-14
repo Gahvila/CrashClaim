@@ -1,8 +1,11 @@
 package net.crashcraft.crashclaim.localization;
 
+import co.aikar.idb.DB;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.crashcraft.crashclaim.CrashClaim;
 import net.crashcraft.crashclaim.claimobjects.Claim;
+import net.crashcraft.crashclaim.config.GlobalConfig;
+import net.crashcraft.crashclaim.payment.PaymentProcessor;
 import net.crashcraft.crashclaim.visualize.api.BaseVisual;
 import net.crashcraft.crashclaim.visualize.api.VisualGroup;
 import net.crashcraft.crashclaim.visualize.api.claim.BlockClaimVisual;
@@ -13,15 +16,24 @@ import org.jetbrains.annotations.NotNull;
 
 public class CrashClaimExpansion extends PlaceholderExpansion {
     private final CrashClaim crashClaim;
+    private final PaymentProcessor provider;
 
-    public CrashClaimExpansion(CrashClaim crashClaim){
+    public CrashClaimExpansion(CrashClaim crashClaim, PaymentProcessor provider) {
         this.crashClaim = crashClaim;
+        this.provider = provider;
     }
 
     @Override
     public String onRequest(OfflinePlayer player, @NotNull String params) {
         if (player != null){
             switch (params.toLowerCase()) {
+                case "balance" -> {
+                    double bal = provider.getProvider().getCachedBalance(player.getUniqueId());
+                    return Integer.toString((int) bal);
+                }
+                case "max_balance" -> {
+                    return Integer.toString(GlobalConfig.maxClaimBlocks);
+                }
                 case "total_owned_claims" -> {
                     return Integer.toString(crashClaim.getDataManager().getNumberOwnedClaims(player.getUniqueId()));
                 }

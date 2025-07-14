@@ -1,7 +1,6 @@
 package net.crashcraft.crashclaim.menus.list;
 
 import co.aikar.taskchain.TaskChain;
-import io.papermc.lib.PaperLib;
 import net.crashcraft.crashclaim.CrashClaim;
 import net.crashcraft.crashclaim.claimobjects.Claim;
 import net.crashcraft.crashclaim.config.GlobalConfig;
@@ -192,7 +191,7 @@ public class ClaimListMenu extends GUI {
             return;
         }
 
-        PaperLib.teleportAsync(player, new Location(world, x,
+        player.teleportAsync(new Location(world, x,
                 world.getHighestBlockYAt(x, z) + 1,
                 z));
     }

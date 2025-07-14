@@ -3,7 +3,6 @@ package net.crashcraft.crashclaim.crashutils.menusystem.defaultmenus;
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import io.papermc.lib.PaperLib;
 import net.crashcraft.crashclaim.CrashClaim;
 import net.crashcraft.crashclaim.crashutils.menusystem.GUI;
 import net.crashcraft.crashclaim.localization.Localization;
@@ -58,7 +57,7 @@ public class PlayerListMenu extends GUI {
 
         HashMap<Integer, UUID> headMap = new HashMap<>();
 
-        final boolean isPaper = PaperLib.isPaper();
+        final boolean isPaper = true;
 
         int slot = 10;
         for (UUID uuid : getPageFromArray()){

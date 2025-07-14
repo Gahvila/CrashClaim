@@ -5,7 +5,8 @@ import net.crashcraft.crashclaim.CrashClaim;
 import net.crashcraft.crashclaim.commands.claiming.ClaimCommand;
 import net.crashcraft.crashclaim.commands.claiming.UnClaimCommand;
 import net.crashcraft.crashclaim.data.ClaimDataManager;
-import net.crashcraft.crashclaim.migration.MigrationAdapter;
+import net.crashcraft.crashclaim.payment.PaymentProcessor;
+import net.crashcraft.crashclaim.payment.PaymentProvider;
 import net.crashcraft.crashclaim.permissions.BypassManager;
 import net.crashcraft.crashclaim.permissions.PermissionHelper;
 import net.crashcraft.crashclaim.visualize.VisualizationManager;
@@ -15,13 +16,13 @@ import java.util.ArrayList;
 public class CommandManager {
     private final PaperCommandManager commandManager;
     private final CrashClaim plugin;
+    private final PaymentProcessor paymentProcessor;
 
-    public CommandManager(CrashClaim plugin) {
+    public CommandManager(CrashClaim plugin, PaymentProcessor paymentProcessor) {
         this.plugin = plugin;
-
+        this.paymentProcessor = paymentProcessor;
         this.commandManager = new PaperCommandManager(plugin);
 
-        loadCommandCompletions();
         loadCommands();
     }
 
@@ -41,18 +42,8 @@ public class CommandManager {
         commandManager.registerCommand(new BypassCommand(bypassManager));
         commandManager.registerCommand(new ClaimInfoCommand(manager));
         commandManager.registerCommand(new EjectCommand(manager));
-        commandManager.registerCommand(new AdminCommand(plugin, plugin.getMigrationManager()));
-    }
-
-    private void loadCommandCompletions(){
-        ArrayList<MigrationAdapter> adapters = plugin.getMigrationManager().getAdapters();
-        String[] completions = new String[adapters.size()];
-
-        for (int x = 0; x < completions.length; x++){
-            completions[x] = adapters.get(x).getIdentifier();
-        }
-
-        commandManager.getCommandCompletions().registerStaticCompletion("migrators", completions);
+        commandManager.registerCommand(new AdminCommand(plugin));
+        commandManager.registerCommand(new EconomyCommand(paymentProcessor));
     }
 
     public PaperCommandManager getCommandManager() {

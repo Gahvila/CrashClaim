@@ -26,31 +26,21 @@ repositories {
 
 dependencies {
     // Paper
-    compileOnly("io.papermc.paper:paper-api:1.21.5-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.21.7-R0.1-SNAPSHOT")
 
     // Other
     implementation("co.aikar:taskchain-bukkit:3.7.2")
-    implementation("net.wesjd:anvilgui:1.10.3-SNAPSHOT")
     implementation("co.aikar:fastutil-base:3.0-SNAPSHOT")
     implementation("co.aikar:fastutil-longbase:3.0-SNAPSHOT")
     implementation("co.aikar:fastutil-longhashmap:3.0-SNAPSHOT")
     implementation("co.aikar:acf-paper:0.5.1-SNAPSHOT")
-    implementation("io.papermc:paperlib:1.0.7")
     implementation("co.aikar:idb-core:1.0.0-SNAPSHOT")
     implementation("com.zaxxer:HikariCP:5.1.0")
-    implementation("org.bstats:bstats-bukkit:3.0.2")
-    compileOnly("com.github.retrooper:packetevents-spigot:2.8.0-SNAPSHOT")
-    compileOnly("com.github.N0RSKA:DeluxeSellwandsAPI:32c")
-    compileOnly("com.ghostchu:quickshop-api:5.2.0.8")
+    compileOnly("com.github.retrooper:packetevents-spigot:2.9.1")
     compileOnly("com.google.guava:guava:33.2.1-jre")
-    compileOnly("net.milkbowl.vault:VaultAPI:1.7")
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.9")
-    compileOnly("com.github.TechFortress:GriefPrevention:16.18.1")
     compileOnly("me.clip:placeholderapi:2.11.5")
-    compileOnly("us.dynmap:dynmap-api:3.4-SNAPSHOT")
     compileOnly("net.luckperms:api:5.4")
-    compileOnly("com.google.auto.service:auto-service:1.1.1")
-    annotationProcessor("com.google.auto.service:auto-service:1.1.1")
 
     compileOnly("net.gahvila:gahvilacore:2.1-SNAPSHOT")
 
@@ -70,10 +60,8 @@ tasks {
         relocate("co.aikar.idb", "net.crashcraft.crashclaim.idb")
         relocate("co.aikar.taskchain", "net.crashcraft.crashclaim.taskchain")
         relocate("io.papermc.lib", "net.crashcraft.crashclaim.paperlib")
-        relocate("org.bstats", "net.crashcraft.crashclaim.bstats")
         relocate("it.unimi.dsi", "net.crashcraft.crashclaim.fastutil")
         relocate("com.zaxxer.hikari", "net.crashcraft.crashclaim.hikari")
-        relocate("net.wesjd", "net.crashcraft.crashclaim.anvilgui")
 
         exclude("/com/google/gson/**")
         exclude("/org/intellij/**")

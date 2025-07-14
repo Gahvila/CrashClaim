@@ -1,5 +1,6 @@
 package net.crashcraft.crashclaim.localization;
 
+import net.crashcraft.crashclaim.payment.PaymentProcessor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.minimessage.tag.standard.StandardTags;

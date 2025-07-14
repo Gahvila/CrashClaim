@@ -6,7 +6,6 @@ import co.aikar.commands.annotation.CommandCompletion;
 import co.aikar.commands.annotation.CommandPermission;
 import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Flags;
-import io.papermc.lib.PaperLib;
 import net.crashcraft.crashclaim.CrashClaim;
 import net.crashcraft.crashclaim.claimobjects.Claim;
 import net.crashcraft.crashclaim.config.GlobalConfig;
@@ -66,11 +65,11 @@ public class EjectCommand extends BaseCommand {
 
                 World world = location.getWorld();
                 if (distMax > distMin) {    //Find closest side
-                    PaperLib.teleportAsync(otherPlayer, new Location(world, claim.getMinX() - 1,
+                    otherPlayer.teleportAsync(new Location(world, claim.getMinX() - 1,
                             world.getHighestBlockYAt(claim.getMinX() - 1,
                                     location.getBlockZ()), location.getBlockZ()));
                 } else {
-                    PaperLib.teleportAsync(otherPlayer, new Location(world, claim.getMaxX() + 1,
+                    otherPlayer.teleportAsync(new Location(world, claim.getMaxX() + 1,
                             world.getHighestBlockYAt(claim.getMaxX() + 1,
                                     location.getBlockZ()), location.getBlockZ()));
                 }

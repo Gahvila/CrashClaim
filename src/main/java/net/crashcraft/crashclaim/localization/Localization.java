@@ -1,6 +1,5 @@
 package net.crashcraft.crashclaim.localization;
 
-import io.papermc.lib.PaperLib;
 import net.crashcraft.crashclaim.CrashClaim;
 import net.crashcraft.crashclaim.config.BaseConfig;
 import net.crashcraft.crashclaim.config.ConfigManager;
@@ -27,6 +26,18 @@ import java.util.List;
 import java.util.logging.Logger;
 
 public enum Localization {
+    //Claimblocks
+    ECONOMY__CHECK_SELF_BALANCE("<gold>ClaimBlock Balance: <yellow><balance>/<max-balance>"),
+    ECONOMY__CHECK_OTHER_BALANCE("<gold>ClaimBlock Balance for <green><username><gold>: <yellow><balance>/<max-balance>"),
+    ECONOMY__ADD_OTHER("<green>Successfully added <yellow><balance> <green>ClaimBlocks to <gold><username>"),
+    ECONOMY__ADD_OTHER_ERROR("<red>Failed to add <yellow><balance> <red>ClaimBlocks to <gold><username><red> reason: <error>"),
+    ECONOMY__REMOVE_OTHER("<green>Successfully removed <yellow><balance> <green>ClaimBlocks from <gold><username>"),
+    ECONOMY__REMOVE_OTHER_ERROR("<red>Failed to remove <yellow><balance> <red>ClaimBlocks from <gold><username><red> reason: <error>"),
+
+    ALERT__MAX_BLOCKS("<gold>You have reached the ClaimBlock limit of <yellow><max-balance>"),
+    ALERT__CHAT("<yellow><bold>+<reward></bold> ClaimBlocks Rewarded"),
+    ALERT__ACTIONBAR("<yellow><bold>+<reward></bold> ClaimBlocks Rewarded"),
+
     //PlaceholderAPI
     PLACEHOLDERAPI__VISUAL_STATUS_SHOWN("shown"),
     PLACEHOLDERAPI__VISUAL_STATUS_HIDDEN("hidden"),
@@ -262,7 +273,7 @@ public enum Localization {
     MENU__SUB_CLAIM__TITLE("Sub-Claim Settings"),
     MENU__SUB_CLAIM_LIST__TITLE("Sub-Claims"),
 
-    MENU__CLAIM__RENAME__MESSAGE(Material.PAPER, 1, "Enter new claim name"),
+    MENU__CLAIM__RENAME__MESSAGE("Enter new claim name"),
     MENU__CLAIM__RENAME__CONFIRMATION("<green>Change claim name to <gold><name>"),
 
     MENU__CLAIM__ENTRY_MESSAGE__MESSAGE(Material.PAPER, 1, "Enter new claim entry message"),
@@ -748,30 +759,15 @@ public enum Localization {
             String newTitle = hasPlaceholders ? LocalizationLoader.placeholderManager.usePlaceholders(player, title) : title;
             iMeta.displayName(Component.empty().decoration(TextDecoration.ITALIC, false).append(LocalizationLoader.parser.deserialize(newTitle, generateTagResolver(replace))));
 
-            if (PaperLib.isPaper()){
-                List<Component> components = new ArrayList<>(lore.size());
-                for (String line : lore) {
-                    components.add(
-                            Component.empty().decoration(TextDecoration.ITALIC, false).append(LocalizationLoader.parser.deserialize(
-                                    hasPlaceholders ? LocalizationLoader.placeholderManager.usePlaceholders(player, line) : line, generateTagResolver(replace)))
-                    );
-                }
-
-                iMeta.lore(components);
-            } else {
-                List<String> components = new ArrayList<>(lore.size());
-
-                LegacyComponentSerializer serializer = LegacyComponentSerializer.builder().build();
-                for (String line : lore) {
-                    components.add(
-                            serializer.serialize(
-                                    Component.empty().decoration(TextDecoration.ITALIC, false).append(LocalizationLoader.parser.deserialize(
-                                            hasPlaceholders ? LocalizationLoader.placeholderManager.usePlaceholders(player, line) : line, generateTagResolver(replace))))
-                    );
-                }
-
-                iMeta.setLore(components);
+            List<Component> components = new ArrayList<>(lore.size());
+            for (String line : lore) {
+                components.add(
+                        Component.empty().decoration(TextDecoration.ITALIC, false).append(LocalizationLoader.parser.deserialize(
+                                hasPlaceholders ? LocalizationLoader.placeholderManager.usePlaceholders(player, line) : line, generateTagResolver(replace)))
+                );
             }
+
+            iMeta.lore(components);
 
             if (model != null){
                 iMeta.setCustomModelData(model); // Set custom model data.

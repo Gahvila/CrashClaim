@@ -61,4 +61,8 @@ public class PaymentProcessor {
     public PaymentProvider getProvider() {
         return provider;
     }
+
+    public double getCachedBalance(UUID user) {
+        return provider.getCachedBalance(user);
+    }
 }

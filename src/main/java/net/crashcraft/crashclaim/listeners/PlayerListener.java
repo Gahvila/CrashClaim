@@ -1,5 +1,6 @@
 package net.crashcraft.crashclaim.listeners;
 
+import co.aikar.idb.DB;
 import com.destroystokyo.paper.MaterialTags;
 import com.destroystokyo.paper.event.entity.ThrownEggHatchEvent;
 import net.crashcraft.crashclaim.CrashClaim;
@@ -52,6 +53,7 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.inventory.BlockInventoryHolder;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
@@ -66,6 +68,19 @@ public class PlayerListener implements Listener {
         this.perms = manager.getPermissionSetup();
         this.visuals = visuals;
         this.helper = PermissionHelper.getPermissionHelper();
+    }
+
+    @EventHandler (priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void onJoin(PlayerJoinEvent e){
+        UUID uuid = e.getPlayer().getUniqueId();
+        try {
+            Integer id = DB.getFirstColumn("SELECT id FROM players WHERE uuid = ?", uuid.toString());
+            if (id == null){
+                DB.executeInsert("INSERT INTO players(uuid, username) VALUES (?, ?)", uuid.toString(), e.getPlayer().getName());
+            }
+        } catch (SQLException ex){
+            ex.printStackTrace();
+        }
     }
 
     @EventHandler
