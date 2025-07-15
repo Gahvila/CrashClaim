@@ -144,15 +144,12 @@ public class ClaimCommand extends BaseCommand implements Listener {
             return;
         }
         if (modeMap.containsKey(uuid)){
-            player.sendMessage("1");
             if (GlobalConfig.disabled_worlds.contains(player.getWorld().getUID())){
-                player.sendMessage("2");
                 player.sendMessage(Localization.DISABLED_WORLD.getMessage(player));
                 forceCleanup(player.getUniqueId(), true);
                 return;
             }
             ClickState state = modeMap.get(uuid);
-            player.sendMessage("3: " + state);
             switch (state) {
                 case CLAIM -> {
                     Claim claim = dataManager.getClaim(location);
