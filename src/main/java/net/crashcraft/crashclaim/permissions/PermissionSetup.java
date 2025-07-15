@@ -4,6 +4,8 @@ import net.crashcraft.crashclaim.CrashClaim;
 import net.crashcraft.crashclaim.claimobjects.PermState;
 import net.crashcraft.crashclaim.claimobjects.permission.PlayerPermissionSet;
 import org.bukkit.Material;
+import org.bukkit.Registry;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.Container;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -32,25 +34,17 @@ public class PermissionSetup {
         untrackedBlocks = new ArrayList<>();
         extraInteractables = new ArrayList<>();
         heldItemInteraction = new ArrayList<>();
+        Registry.MATERIAL.stream()
+                .filter(Material::isItem)
+                .forEach(material -> {
+                    ItemStack stack = new ItemStack(material);
+                    if (!(stack.getItemMeta() instanceof BlockStateMeta meta)) return;
 
-        for (Material material : Material.values()){
-            if (!material.isItem()) {
-                continue; // skip materials that aren't items due to 1.21 change
-            }
-            ItemStack stack = new ItemStack(material);
-
-            if (stack.getItemMeta() instanceof BlockStateMeta) {
-                BlockStateMeta meta = (BlockStateMeta) stack.getItemMeta();
-
-                if (meta == null)
-                    continue;
-                // checking for BlockInventoryHolder instead of Container due to blocks such as decorated pots technically not being containers, but they still should be here.
-                // also has the added benefit of being able to specify jukebox usage etc.
-                if (meta.getBlockState() instanceof BlockInventoryHolder) {
-                    trackedContainers.add(material);
-                }
-            }
-        }
+                    BlockState state = meta.getBlockState();
+                    if (state instanceof BlockInventoryHolder) {
+                        trackedContainers.add(material);
+                    }
+                });
 
         FileConfiguration lookup = YamlConfiguration.loadConfiguration(new File(Paths.get(claim.getDataFolder().getAbsolutePath(), "lookup.yml").toUri()));
 

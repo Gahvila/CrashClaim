@@ -19,7 +19,7 @@ public class EconomyCommand extends BaseCommand {
     }
 
     @Default
-    @CommandPermission("crashclaimeconomy.user.checkclaimblocks")
+    @CommandPermission("crashclaim.user.checkclaimblocks")
     public void onBalance(Player player){
         provider.getBalance(player.getUniqueId(), (bal) -> {
             player.sendRichMessage("Sinulla on <#85FF00>" + bal.intValue() + "</#85FF00> suojauspalikkaa." );
@@ -28,7 +28,7 @@ public class EconomyCommand extends BaseCommand {
 
     @Subcommand("check")
     @CommandCompletion("@players")
-    @CommandPermission("crashclaimeconomy.admin.checkclaimblocks")
+    @CommandPermission("crashclaim.admin.checkclaimblocks")
     public void onBalance(CommandSender sender, OfflinePlayer player){
         provider.getBalance(player.getUniqueId(), (bal) -> {
             sender.sendMessage(Localization.ECONOMY__CHECK_OTHER_BALANCE.getMessage(null,
@@ -40,7 +40,7 @@ public class EconomyCommand extends BaseCommand {
 
     @Subcommand("add")
     @CommandCompletion("@players @nothing")
-    @CommandPermission("crashclaimeconomy.admin.addclaimblocks")
+    @CommandPermission("crashclaim.admin.addclaimblocks")
     public void onAdd(CommandSender sender, OfflinePlayer player, int amount){
         provider.makeTransaction(player.getUniqueId(), TransactionType.DEPOSIT, "ClaimBlock Admin Add", amount, (transactionRecipe) -> {
             if (transactionRecipe.transactionSuccess()){
@@ -58,7 +58,7 @@ public class EconomyCommand extends BaseCommand {
 
     @Subcommand("remove")
     @CommandCompletion("@players @nothing")
-    @CommandPermission("crashclaimeconomy.admin.removeclaimblocks")
+    @CommandPermission("crashclaim.admin.removeclaimblocks")
     public void onRemove(CommandSender sender, OfflinePlayer player, int amount){
         provider.makeTransaction(player.getUniqueId(), TransactionType.WITHDRAW, "ClaimBlock Admin Remove", amount, (transactionRecipe) -> {
             if (transactionRecipe.transactionSuccess()){
