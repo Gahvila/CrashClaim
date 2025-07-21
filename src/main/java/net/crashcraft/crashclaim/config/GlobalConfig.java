@@ -29,7 +29,6 @@ public class GlobalConfig extends BaseConfig{
         skipNaturalMobGrief = getBoolean("skip-natural-mob-grief", false);
 
         initialClaimBlocks = getInt("initial-claimblocks", 100);
-        maxClaimBlocks = getInt("max-claimblocks", 5000);
 
         claimBlockReward = getInt("reward", 25);
         claimBlockRewardMillis = getInt("reward-minutes", 60) * 60 * 1000;

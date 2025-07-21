@@ -22,7 +22,8 @@ public class EconomyCommand extends BaseCommand {
     @CommandPermission("crashclaim.user.checkclaimblocks")
     public void onBalance(Player player){
         provider.getBalance(player.getUniqueId(), (bal) -> {
-            player.sendRichMessage("Sinulla on <#85FF00>" + bal.intValue() + "</#85FF00> suojauspalikkaa." );
+            player.sendMessage(Localization.ECONOMY__CHECK_SELF_BALANCE.getMessage(player,
+                    "balance", Integer.toString(bal.intValue())));
         });
     }
 
@@ -33,8 +34,7 @@ public class EconomyCommand extends BaseCommand {
         provider.getBalance(player.getUniqueId(), (bal) -> {
             sender.sendMessage(Localization.ECONOMY__CHECK_OTHER_BALANCE.getMessage(null,
                     "username", player.getName(),
-                    "balance", Integer.toString(bal.intValue()),
-                    "max-balance", Integer.toString(GlobalConfig.maxClaimBlocks)));
+                    "balance", Integer.toString(bal.intValue())));
         });
     }
 

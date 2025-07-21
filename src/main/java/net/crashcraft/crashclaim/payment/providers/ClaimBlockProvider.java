@@ -3,6 +3,8 @@ package net.crashcraft.crashclaim.payment.providers;
 import co.aikar.idb.DB;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import net.crashcraft.crashclaim.config.GlobalConfig;
+import net.crashcraft.crashclaim.localization.Localization;
 import net.crashcraft.crashclaim.payment.PaymentProvider;
 import net.crashcraft.crashclaim.payment.ProviderInitializationException;
 import net.crashcraft.crashclaim.payment.TransactionRecipe;
@@ -98,7 +100,8 @@ public class ClaimBlockProvider implements PaymentProvider, Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         getBalance(player.getUniqueId(), (balance) -> {
-            player.sendRichMessage("Sinulla on <#85FF00>" + balance.intValue() + "</#85FF00> suojauspalikkaa." );
+            player.sendMessage(Localization.ECONOMY__CHECK_SELF_BALANCE.getMessage(player,
+                    "balance", Integer.toString(balance.intValue())));
         });
     }
 

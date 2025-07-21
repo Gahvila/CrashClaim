@@ -31,9 +31,6 @@ public class CrashClaimExpansion extends PlaceholderExpansion {
                     double bal = provider.getProvider().getCachedBalance(player.getUniqueId());
                     return Integer.toString((int) bal);
                 }
-                case "max_balance" -> {
-                    return Integer.toString(GlobalConfig.maxClaimBlocks);
-                }
                 case "total_owned_claims" -> {
                     return Integer.toString(crashClaim.getDataManager().getNumberOwnedClaims(player.getUniqueId()));
                 }
