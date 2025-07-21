@@ -35,26 +35,21 @@ dependencies {
     implementation("co.aikar:fastutil-longhashmap:3.0-SNAPSHOT")
     implementation("co.aikar:acf-paper:0.5.1-SNAPSHOT")
     implementation("co.aikar:idb-core:1.0.0-SNAPSHOT")
-    implementation("com.zaxxer:HikariCP:5.1.0")
+    implementation("com.zaxxer:HikariCP:6.2.1")
     compileOnly("com.github.retrooper:packetevents-spigot:2.9.1")
-    compileOnly("com.google.guava:guava:33.2.1-jre")
+    compileOnly("com.google.guava:guava:33.4.8-jre")
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.9")
     compileOnly("me.clip:placeholderapi:2.11.5")
     compileOnly("net.luckperms:api:5.4")
 
     compileOnly("net.gahvila:gahvilacore:2.1-SNAPSHOT")
 
-    // Cache2k
-    val cache2kVersion = "1.2.2.Final"
-
-    implementation("org.cache2k:cache2k-api:${cache2kVersion}")
-    runtimeOnly("org.cache2k:cache2k-core:${cache2kVersion}")
+    implementation("com.github.ben-manes.caffeine:caffeine:3.2.2")
 }
 
 tasks {
     shadowJar {
         archiveFileName.set("${rootProject.name}-${version}.jar")
-        // for some reason cache2k does not like being relocated, likely due to generative class loading & relocation not playing nice
         relocate("co.aikar.locales", "net.crashcraft.crashclaim.aikarlocales")
         relocate("co.aikar.commands", "net.crashcraft.crashclaim.acf")
         relocate("co.aikar.idb", "net.crashcraft.crashclaim.idb")
@@ -62,6 +57,7 @@ tasks {
         relocate("io.papermc.lib", "net.crashcraft.crashclaim.paperlib")
         relocate("it.unimi.dsi", "net.crashcraft.crashclaim.fastutil")
         relocate("com.zaxxer.hikari", "net.crashcraft.crashclaim.hikari")
+        relocate("com.github.benmanes.caffeine", "net.crashcraft.crashclaim.caffeine")
 
         exclude("/com/google/gson/**")
         exclude("/org/intellij/**")

@@ -21,9 +21,6 @@ public class GlobalConfig extends BaseConfig{
     public static int claimBlockRewardMillis;
 
     public static boolean sendRewardAlert;
-    public static int alertFadeIn;
-    public static int alertDuration;
-    public static int alertFadeOut;
 
     public static boolean sendInChatInstead;
 
@@ -38,9 +35,6 @@ public class GlobalConfig extends BaseConfig{
         claimBlockRewardMillis = getInt("reward-minutes", 60) * 60 * 1000;
 
         sendRewardAlert = getBoolean("send-reward-alert", true);
-        alertFadeIn = getInt("reward-alert.fadeIn", 15);
-        alertDuration = getInt("reward-alert.duration", 20);
-        alertFadeOut = getInt("reward-alert.fadeOut", 15);
         sendInChatInstead = getBoolean("send-reward-alert-in-chat", false);
     }
 

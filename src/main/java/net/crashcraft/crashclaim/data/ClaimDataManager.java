@@ -1,5 +1,7 @@
 package net.crashcraft.crashclaim.data;
 
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.crashcraft.crashclaim.CrashClaim;
 import net.crashcraft.crashclaim.claimobjects.Claim;
@@ -30,10 +32,8 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.scheduler.BukkitTask;
-import org.cache2k.Cache2kBuilder;
-import org.cache2k.CacheEntry;
-import org.cache2k.IntCache;
 
+import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -50,7 +50,7 @@ public class ClaimDataManager implements Listener {
     private final DataProvider provider;
     private final PermissionSetup permissionSetup;
 
-    private final IntCache<Claim> claimLookup; // claim id - claim  - First to get called on loads
+    private final LoadingCache<Integer, Claim> claimLookup; // claim id - claim  - First to get called on loads
     private final HashMap<UUID, Long2ObjectOpenHashMap<ArrayList<Integer>>> chunkLookup; // Pre load with data from mem
 
     private final AtomicInteger idCounter;
@@ -74,31 +74,26 @@ public class ClaimDataManager implements Listener {
         provider.init(plugin, this);
         Bukkit.getPluginManager().registerEvents(provider, plugin);
 
-        claimLookup = new Cache2kBuilder<Integer, Claim>() {}
-                .name("chunkToClaimCache")
-                .storeByReference(true)
-                .loaderThreadCount(3)
-                .disableStatistics(true)
-                .loader((id) -> {
+        claimLookup = Caffeine.newBuilder()
+                .executor(Runnable::run) // Use current thread for async ops
+                .build(id -> {
                     Claim claim = provider.loadClaim(id);
                     if (claim != null) {
                         fixupOwnerPerms(claim);
-                        return claim;
-                    } else {
-                        return null;
                     }
-                })
-                .buildForIntKey();
+                    return claim;
+                });
+
 
         logger.info("Starting claim saving routine");
         Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
-            for (CacheEntry<Integer, Claim> entry : claimLookup.entries()){
+            for (Map.Entry<Integer, Claim> entry : claimLookup.asMap().entrySet()) {
                 Claim claim = entry.getValue();
 
-                if (claim == null || !claim.isToSave() || claim.isDeleted()){
+                if (claim == null || !claim.isToSave() || claim.isDeleted()) {
                     continue;
                 }
-
+                logger.fine("Running periodic claim save. Cache size: " + claimLookup.estimatedSize());
                 saveClaim(claim);
             }
         }, 200L, 200L);
@@ -402,7 +397,7 @@ public class ClaimDataManager implements Listener {
         try {
             claim.setDeleted(); // Make sure it doesn't get saved again
 
-            claimLookup.remove(Integer.valueOf(claim.getId()));
+            claimLookup.invalidate(claim.getId());
             provider.removeClaim(claim);
 
             //Chunks
@@ -560,8 +555,11 @@ public class ClaimDataManager implements Listener {
 
         ArrayList<Integer> claims = map.get(seed);
         if (claims != null){
-            claimLookup.prefetchAll(claims, null);
+            for (Integer id : claims) {
+                claimLookup.get(id);
+            }
         }
+
     }
 
     public synchronized void saveClaim(Claim claim){
@@ -715,10 +713,10 @@ public class ClaimDataManager implements Listener {
 
     public void cleanupAndClose() {
         chunkLookup.clear();
-        claimLookup.clearAndClose();
+        claimLookup.invalidateAll();
     }
 
-    public IntCache<Claim> getClaimCache() {
+    public LoadingCache<Integer, Claim> getClaimCache() {
         return claimLookup;
     }
 }
