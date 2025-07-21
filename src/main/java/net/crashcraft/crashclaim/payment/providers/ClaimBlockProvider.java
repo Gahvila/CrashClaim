@@ -1,19 +1,19 @@
 package net.crashcraft.crashclaim.payment.providers;
 
 import co.aikar.idb.DB;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import net.crashcraft.crashclaim.payment.PaymentProvider;
 import net.crashcraft.crashclaim.payment.ProviderInitializationException;
 import net.crashcraft.crashclaim.payment.TransactionRecipe;
 import net.crashcraft.crashclaim.payment.TransactionType;
 
 import java.sql.SQLException;
-import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 public class ClaimBlockProvider implements PaymentProvider {
-    private final Map<UUID, Double> balanceCache = new ConcurrentHashMap<>();
+    private final Cache<UUID, Double> balanceCache = Caffeine.newBuilder().build();
 
     @Override
     public String getProviderIdentifier() {
@@ -43,10 +43,7 @@ public class ClaimBlockProvider implements PaymentProvider {
                         DB.executeUpdate("REPLACE INTO claimblocks(amount, player_id) VALUES(?, (SELECT id FROM players WHERE uuid = ?))",
                                 bal - realAmount,
                                 user);
-
-                        // update cache
                         balanceCache.put(user, bal - realAmount);
-
                         callback.accept(new TransactionRecipe(user, realAmount, "ClaimBlock Withdraw"));
                     } catch (SQLException e){
                         e.printStackTrace();
@@ -54,15 +51,13 @@ public class ClaimBlockProvider implements PaymentProvider {
                     }
                 }
             });
+
             case DEPOSIT -> getBalance(user, (bal) -> {
                 try {
                     DB.executeUpdate("REPLACE INTO claimblocks(amount, player_id) VALUES(?, (SELECT id FROM players WHERE uuid = ?))",
                             bal + realAmount,
                             user.toString());
-
-                    // update cache
                     balanceCache.put(user, bal + realAmount);
-
                     callback.accept(new TransactionRecipe(user, realAmount, "ClaimBlock Deposit"));
                 } catch (SQLException e) {
                     e.printStackTrace();
@@ -77,13 +72,10 @@ public class ClaimBlockProvider implements PaymentProvider {
         DB.getFirstColumnAsync("SELECT amount FROM claimblocks WHERE player_id = (SELECT id FROM players WHERE uuid = ?)", user.toString())
                 .thenAccept((bal) -> {
                     double result = (bal == null) ? 0D : (double)((int) bal);
-
-                    // cache the balance
                     balanceCache.put(user, result);
-
                     callback.accept(result);
                 })
-                .exceptionally((e) -> {
+                .exceptionally(e -> {
                     e.printStackTrace();
                     callback.accept(0D);
                     return null;
@@ -92,6 +84,7 @@ public class ClaimBlockProvider implements PaymentProvider {
 
     @Override
     public double getCachedBalance(UUID user) {
-        return balanceCache.getOrDefault(user, 0D);
+        Double cached = balanceCache.getIfPresent(user);
+        return cached != null ? cached : 0D;
     }
 }
