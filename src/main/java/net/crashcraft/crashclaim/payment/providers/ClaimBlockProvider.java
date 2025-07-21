@@ -7,12 +7,18 @@ import net.crashcraft.crashclaim.payment.PaymentProvider;
 import net.crashcraft.crashclaim.payment.ProviderInitializationException;
 import net.crashcraft.crashclaim.payment.TransactionRecipe;
 import net.crashcraft.crashclaim.payment.TransactionType;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.sql.SQLException;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-public class ClaimBlockProvider implements PaymentProvider {
+public class ClaimBlockProvider implements PaymentProvider, Listener {
     private final Cache<UUID, Double> balanceCache = Caffeine.newBuilder().build();
 
     @Override
@@ -86,5 +92,18 @@ public class ClaimBlockProvider implements PaymentProvider {
     public double getCachedBalance(UUID user) {
         Double cached = balanceCache.getIfPresent(user);
         return cached != null ? cached : 0D;
+    }
+
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+        getBalance(player.getUniqueId(), (balance) -> {
+            player.sendRichMessage("Sinulla on <#85FF00>" + balance.intValue() + "</#85FF00> suojauspalikkaa." );
+        });
+    }
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        balanceCache.invalidate(event.getPlayer().getUniqueId());
     }
 }
