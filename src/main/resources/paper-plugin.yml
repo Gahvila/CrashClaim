@@ -13,6 +13,8 @@ dependencies:
     PlaceholderAPI:
       required: false
     packetevents:
+      load: BEFORE
       required: true
+      join-classpath: true
     GahvilaCore:
       required: true
