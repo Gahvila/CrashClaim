@@ -1,5 +1,6 @@
 package net.crashcraft.crashclaim.commands.claiming.modes;
 
+import net.crashcraft.crashclaim.api.events.PreClaimResizeEvent;
 import net.crashcraft.crashclaim.claimobjects.Claim;
 import net.crashcraft.crashclaim.commands.claiming.ClaimCommand;
 import net.crashcraft.crashclaim.commands.claiming.ClaimMode;
@@ -13,6 +14,7 @@ import net.crashcraft.crashclaim.visualize.VisualizationManager;
 import net.crashcraft.crashclaim.visualize.api.BaseVisual;
 import net.crashcraft.crashclaim.visualize.api.VisualColor;
 import net.crashcraft.crashclaim.visualize.api.VisualGroup;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -72,6 +74,15 @@ public class ResizeClaimMode implements ClaimMode {
 
         if (!PermissionHelper.getPermissionHelper().hasPermission(claim, player.getUniqueId(), PermissionRoute.MODIFY_CLAIM)){
             cleanup(player.getUniqueId(), true);
+            return;
+        }
+
+        PreClaimResizeEvent event = new PreClaimResizeEvent(player, claim, firstLocation, click);
+        Bukkit.getPluginManager().callEvent(event);
+
+        if (event.isCancelled()) {
+            player.sendMessage(Localization.RESIZE__ERROR_OTHER.getMessage(player));
+            cleanup(uuid, true);
             return;
         }
 

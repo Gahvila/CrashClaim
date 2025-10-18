@@ -1,6 +1,7 @@
 package net.crashcraft.crashclaim.commands.claiming.modes;
 
 import net.crashcraft.crashclaim.CrashClaim;
+import net.crashcraft.crashclaim.api.events.PreClaimCreateEvent;
 import net.crashcraft.crashclaim.claimobjects.Claim;
 import net.crashcraft.crashclaim.commands.claiming.ClaimCommand;
 import net.crashcraft.crashclaim.commands.claiming.ClaimMode;
@@ -63,6 +64,13 @@ public class NewClaimMode implements ClaimMode {
             return false;
         }
 
+        PreClaimCreateEvent event = new PreClaimCreateEvent(player, min, max);
+        Bukkit.getPluginManager().callEvent(event);
+
+        if (event.isCancelled()) {
+            player.sendMessage(Localization.NEW_CLAIM__OTHER_ERROR.getMessage(player));
+            return false;
+        }
         return true;
     }
 
