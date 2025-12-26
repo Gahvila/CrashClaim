@@ -26,7 +26,7 @@ repositories {
 
 dependencies {
     // Paper
-    compileOnly("io.papermc.paper:paper-api:1.21.7-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
 
     // Other
     implementation("co.aikar:taskchain-bukkit:3.7.2")
@@ -45,6 +45,9 @@ dependencies {
     compileOnly("net.gahvila:gahvilacore:2.1-SNAPSHOT")
 
     implementation("com.github.ben-manes.caffeine:caffeine:3.2.2")
+
+    compileOnly("com.google.auto.service:auto-service-annotations:1.1.1")
+    annotationProcessor("com.google.auto.service:auto-service:1.1.1")
 }
 
 tasks {
@@ -63,6 +66,7 @@ tasks {
         exclude("/org/intellij/**")
         exclude("/org/jetbrains/**")
         exclude("/org/slf4j/**")
+        mergeServiceFiles()
     }
 
     build {
